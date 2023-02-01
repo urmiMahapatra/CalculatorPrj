@@ -1,7 +1,8 @@
-prev = 0;
+prev = NaN;
 curr = 0;
 currOp = "";
 isFloat = false;
+floatConv = 10;
 
 function Clicked(input) {
     let c1 = checkedNumOrOp(input);
@@ -9,7 +10,8 @@ function Clicked(input) {
         processOperator(input);
     } else {
         if(isFloat) {
-            curr = curr + c1*0.1;
+            curr = curr + (c1/floatConv);
+            floatConv *= 10;
         } else {
             curr = curr * 10 + c1;
         }
@@ -17,13 +19,17 @@ function Clicked(input) {
     }
 }
 
+function resetFloat() {
+    isFloat = false;
+    floatConv = 10;
+}
 
 function clearDisplay(){
-    document.getElementById("display").innerHTML="";
-    prev = 0;
+    document.getElementById("display").innerHTML="0";
+    prev = NaN;
     curr = 0;
     currOp = "";
-    isFloat = false;
+    resetFloat();
 }
 
 function displayText(text) {
@@ -35,44 +41,52 @@ function checkedNumOrOp(inChar) {
 }
 
 function processOperator(inChar) {
-    alert(inChar);
-    if(inChar == "+/-") {
+    console.log("inChar " + inChar)
+    if(inChar == ".") {
+        curr = curr * 1.0;
+        isFloat = true;
+        dispText = curr + ".";
+        console.log("dispText = " + dispText);
+        displayText(dispText);
+    } 
+    else if(inChar == "+/-") {
+        resetFloat();
         curr = -curr;
         displayText(curr);
     } 
-    else if(inChar == ".") {
-        curr = curr * 1.0;
-        isFloat = true;
-        displayText(curr);
-    } 
-    else if(inChar == "=") {
-        solve(currOp);
+    else if(prev == NaN) {
+        console.log("prev is NaN")
         currOp = "";
-    } 
-    else if(currOp == "") {
+        return;
+    }
+    else if  (currOp == "") {
         currOp = inChar;
         prev = curr;
         curr = 0;
         displayText(prev);
+        resetFloat();
     }
     else {
+        resetFloat();
         solve(currOp);
         currOp = inChar;
     }
 }
 
+
 function solve(operator){
     if(operator == "") {
-    } else if(operator =="+") {
+        prev = curr
+    }else if(operator =="+") {
         prev = prev + curr;
-    } else if(operator =="-") {
+    }  else if(operator =="-") {
         prev = prev - curr;
-    } else if(operator =="/") {
+    }  else if(operator =="/") {
         prev = prev / curr;
     } else if(operator =="*") {
         prev = prev * curr;
     } else if(operator =="%") {
-        prev = prev * curr / 100;
+        prev = (prev * curr )/ 100;
     }
     curr = 0;
     displayText(prev);
